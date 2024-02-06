@@ -31,7 +31,7 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
           cd docs 
           echo "HAMSTER"
           ls
-          sphinx-build source build
+          sphinx-build -M html source build
           ls
 
           
