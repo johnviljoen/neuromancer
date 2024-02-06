@@ -30,7 +30,7 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         run: |
           cd docs 
           TZ=UTC sphinx-build source build
-          ls
+          
 
           
       # Step 5: Deploy the newly built docs to gh-pages branch
