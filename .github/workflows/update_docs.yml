@@ -29,6 +29,8 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
       - name: Sphinx build
         run: |
           cd docs 
+          echo "HAMSTER"
+          ls
           TZ=UTC sphinx-build source build
           ls
 
