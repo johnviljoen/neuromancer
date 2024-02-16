@@ -29,10 +29,10 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
       - name: Sphinx build
         run: |
           cd docs 
-          echo "HAMSTER"
           ls
           sphinx-build -M html source build
-          ls
+        
+
 
           
       # Step 5: Deploy the newly built docs to gh-pages branch
@@ -45,7 +45,7 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/html
+          publish_dir: build
           keep_files: true 
 
 
