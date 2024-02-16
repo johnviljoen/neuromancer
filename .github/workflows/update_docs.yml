@@ -23,7 +23,7 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
       # Step 3: define a step that install dependencies (Sphinx etc) for this runner
       - name: Install dependencies #name of this step
         run: | #indicate that following script is meant to be multi-line
-          pip install sphinx sphinx_rtd_theme myst_parser 
+          pip install sphinx sphinx_rtd_theme myst_parser neuromancer
 
       # Step 4: Build docs using sphinx. TZ=UTC needed to circumvent a nuance of running Sphinx on GHA runner
       - name: Sphinx build
