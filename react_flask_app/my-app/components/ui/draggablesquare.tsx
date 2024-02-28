@@ -1,17 +1,71 @@
 "use client";
 
-import Draggable from 'react-draggable';
-import React from 'react';
+import { useId } from 'react';
+import {FC} from "react";
+import {useDraggable} from "@dnd-kit/core"
+import React, { CSSProperties } from "react";
+import { CSS } from "@dnd-kit/utilities";
 
-const DraggableSquare = ({ id, name }) => {
+
+
+
+export interface DraggableSquareProps {
+  name: string;
+  xpos: number; 
+  ypos: number; 
+  tailwindClassName: string; // Make otherstyles optional
+};
+
+const DraggableSquare: React.FC<DraggableSquareProps> = ({ name, xpos, ypos, tailwindClassName }) => {
+  const id = useId(); // Using a custom hook to generate unique IDs
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: id,
+    data: { name: name },
+
+  });
+
+ 
+
+  const style: CSSProperties | undefined = isDragging
+    ? {
+        position: "absolute",
+        transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
+        cursor: "move", 
+
+      }
+    : {
+        position: "relative",
+        cursor: "pointer",
+        left: `${xpos}px`,
+        top: `${ypos}px`,
+
+      };
+
+  const mystyle = 
+  {
+    position: "relative",
+    left: `${xpos}px`,
+    top: `${ypos}px`
+  }; 
+      
+ 
   return (
-    <Draggable>
-      <div className="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded">
+    <>
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        className={tailwindClassName}
+        style={{ ...style, ...mystyle}}
+      
+      >
         {name}
       </div>
-    </Draggable>
+      {isDragging && <div className={tailwindClassName} style={{ display: "none !important" }}>{name}</div>}
+    </>
   );
 };
 
-
 export default DraggableSquare;
+
+

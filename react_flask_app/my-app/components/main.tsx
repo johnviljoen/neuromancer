@@ -12,98 +12,124 @@ import DraggableSquare from '@/components/ui/draggablesquare';
 
 
 import React, { useState, useEffect } from 'react';
+
 import { Button } from "@/components/ui/button";
 import { DatasetCreatorPage } from '@/dataset_page/ui/datasetcreator';
 import EnvironmentPane from "@/components/environment_pane";
+import Canvas from "@/components/canvas";
+import DebugWindow from "@/components/debugwindow";
+// import BlocksContainer from "@/components/blocks";
+import TrashCan from '@/components/ui/trashcan';
+import IntegratorsContainer from '@/components/integratorscontainer';
+import {DndContext, DragEndEvent} from "@dnd-kit/core"
+
+// Define BlockInfo type
+type BlockInfo = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+};
+
 
 export function Main() {
-  const [showDatasetView, setShowDatasetView] = useState(false);
-  const [environmentSquares, setEnvironmentSquares] = useState([]);
+  const [elements, setElements] = useState([]);
+  const [canvasMap, setCanvasMap] = useState<Map<string, BlockInfo>>(new Map());
+  
 
-  const toggleDatasetView = () => {
-    setShowDatasetView(!showDatasetView);
-  };
-
-  // Load environment squares from local storage when component mounts
-  useEffect(() => {
-    const storedSquares = JSON.parse(localStorage.getItem('environmentSquares'));
-    console.log("FOO")
-    console.log(storedSquares)
-    if (storedSquares) {
-      setEnvironmentSquares(storedSquares);
+  function handleDragEnd(event: any) {
+    if (event.over) {
+      let newElements: any = [...elements, ...[event.active.data.current]];
+      setElements(newElements);
     }
-  }, []);
 
-  // Function to add a square to the environment
-  const addSquareToEnvironment = (name) => {
-    const newSquare = {
-      id: Date.now().toString(),
-      name,
-      position: { x: 0, y: 0 }
-    };
-    setEnvironmentSquares([...environmentSquares, newSquare]);
+  }
+
+
+  const getBlockInformation = (e: DragEndEvent) => {
+    const id = e.active.id;
+    console.log(e.active.id)
+    const name = e.active.data.current.name; 
+    const delta_x = e.delta.x ; 
+    const delta_y = e.delta.y; 
+
+    
+    setCanvasMap((prevCanvasMap) => {
+      const updatedCanvasMap = new Map(prevCanvasMap);
+      const existingBlockInfo = updatedCanvasMap.get(id);
+  
+      if (existingBlockInfo) {
+        // If the block info exists, update its x and y
+        existingBlockInfo.x += delta_x;
+        existingBlockInfo.y += delta_y;
+      } else {
+        // If the block info doesn't exist, create a new one
+        const newBlockInfo: BlockInfo = {
+          id,
+          name,
+          delta_x,
+          delta_y
+        };
+        updatedCanvasMap.set(id, newBlockInfo);
+      }
+
+
+      return updatedCanvasMap;
+    });
   };
 
-  return (
-    <div className="flex h-screen w-full flex-col">
-      <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-900 px-6 dark:bg-gray-950" style={{ backgroundColor: "navy" }}>
-        <Button className="lg:hidden" size="icon" variant="outline">
-          <Package2Icon className="h-6 w-6 text-black" />
-          <span className="sr-only">Home</span>
-        </Button>
-        <nav className="hidden lg:flex h-8 w-full shrink-0 items-center gap-4 text-sm font-medium lg:gap-8 lg:text-base" />
-        <div className="relative">
-          <Button className="rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800" size="icon" variant="ghost">
-            <img
-              alt="Avatar"
-              className="rounded-full"
-              height="32"
-              src="/placeholder.svg"
-              style={{ aspectRatio: "32/32", objectFit: "cover" }}
-              width="32"
-            />
-            <span className="sr-only">Toggle user menu</span>
+
+
+
+  return (  
+    <DndContext onDragEnd={getBlockInformation}>
+      <div className="flex h-screen w-full flex-col">
+        <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-900 px-6 dark:bg-gray-950" style={{ backgroundColor: "navy" }}>
+          <Button className="lg:hidden" size="icon" variant="outline">
+            <Package2Icon className="h-6 w-6 text-black" />
+            <span className="sr-only">Home</span>
           </Button>
-        </div>
-      </header>
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
-        {showDatasetView ? (
-          <DatasetCreatorPage toggleDatasetView={toggleDatasetView} />
-        ) : (
+          <nav className="hidden lg:flex h-8 w-full shrink-0 items-center gap-4 text-sm font-medium lg:gap-8 lg:text-base" />
+          <div className="relative">
+            <Button className="rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800" size="icon" variant="ghost">
+              <img
+                alt="Avatar"
+                className="rounded-full"
+                height="32"
+                src="/placeholder.svg"
+                style={{ aspectRatio: "32/32", objectFit: "cover" }}
+                width="32"
+              />
+              <span className="sr-only">Toggle user menu</span>
+            </Button>
+          </div>
+        </header>
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
           <div className="flex h-full items-center justify-center border-dashed border-2 border-gray-200/50 border-gray-200/50 rounded-lg dark:border-gray-800/50">
             <div className="flex items-center justify-center w-full h-full bg-gray-100 dark:bg-gray-800">
               <div className="flex items-center justify-center w-3/4 h-3/4 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
-                <div className="flex items-start justify-start w-1/16">
-                  <Button
-                    className="w-full"
-                    style={{ backgroundColor: "navy" }}
-                    onClick={toggleDatasetView}
-                  >
-                    Dataset View
-                  </Button>
-                </div>
-                <div className="flex items-center justify-center w-1/4 h-full bg-gray-200 dark:bg-gray-700 rounded-l-lg">
-                  <h2 className="text-lg font-semibold text-black">Components</h2>
-                    <div className="Neuromancer_Components_Container">
-                    <DraggableSquare id="mlp_draggable_squre" name="MLP" />
-                    <DraggableSquare id="resnet_draggable_squre" name="ResNet" />
-                    <DraggableSquare id="linear_draggable_squre" name="Linear" />
+              <div className="flex items-center justify-center w-1/4 h-full bg-gray-200 dark:bg-gray-700 rounded-l-lg">
+                <h2 className="text-lg font-semibold text-black">BlocksContainer</h2>
+                  <div className="Neuromancer_Components_Container">
+                      <DraggableSquare name="MLP" xpos={0} ypos={0} tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
+                      <DraggableSquare name="ResNet" xpos={0} ypos={100}  tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
+                      <DraggableSquare name="Linear" xpos={0} ypos={200}  tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-center w-3/4 h-full bg-gray-50 dark:bg-gray-800 rounded-r-lg">
-                  <h2 className="text-lg font-semibold text-black">Canvas</h2>
-                </div>
+                  <div style={{ margin: '10px 10px' }} /> {/* Spacer with 10px margin */}
+                  <IntegratorsContainer /> {/* Add IntegratorsContainer here */}
+                <Canvas canvasMap={canvasMap}/>
               </div>
             </div>
           </div>
-            
-        )}
-        <div>Environment Squares Count: {environmentSquares.length}</div>
-        <EnvironmentPane environmentSquares={environmentSquares} setEnvironmentSquares={setEnvironmentSquares} />
-      </main>
-    </div>
+        </main>
+      </div>
+    </DndContext>
+ 
   );
 }
+
+
 function Package2Icon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg

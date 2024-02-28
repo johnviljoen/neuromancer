@@ -4,18 +4,23 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 
+"use client"; // top to the file
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
 
 import { Main } from "@/components/main";
+import {DndContext, DragEndEvent} from "@dnd-kit/core"
 
 
 export default function App() {
   return (
+    
     <div>
       <Main />
     </div>
+    
   );
 }
 
