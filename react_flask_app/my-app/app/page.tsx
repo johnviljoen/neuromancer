@@ -6,20 +6,90 @@
 
 "use client"; // top to the file
 
+import React, { useState } from 'react';
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ReactFlowProvider } from 'reactflow';
 import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Main } from "@/components/main";
-import {DndContext, DragEndEvent} from "@dnd-kit/core"
+import { DatasetCreator } from "@/components/datasetcreator"
+ import {DndContext, DragEndEvent} from "@dnd-kit/core"
+
+ type BlockInfo = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  classType: string;
+  tailwindClassName: string;
+};
+
 
 
 export default function App() {
+  const [datasets, setDatasets] = useState([]);
+  const [canvasMap, setCanvasMap] = useState<Map<string, BlockInfo>>(new Map());
+
+  const updateCanvasMap = (newCanvasMap: Map<string, BlockInfo>) => {
+    setCanvasMap(newCanvasMap);
+  };
+
+  console.log("CANVS MAP ROOT");
+  console.log(canvasMap);
+
+  const fooGetBlockInformation = (e: DragEndEvent) => {
+    
+    const id = e.active.id;
+
+    const name = e.active.data.current.name.toLowerCase(); 
+    const classType = e.active.data.current.classType.toLowerCase();
+    const delta_x = e.delta.x ; 
+    const delta_y = e.delta.y; 
+    const tailwindClassName = e.active.data.current.tailwindClassName;
+
+    
+    
+    setCanvasMap((prevCanvasMap) => {
+      const updatedCanvasMap = new Map(prevCanvasMap);
+      const existingBlockInfo = updatedCanvasMap.get(id);
+
+
+  
+      if (existingBlockInfo) {
+        // If the block info exists, update its x and y
+        existingBlockInfo.x += delta_x;
+        existingBlockInfo.y += delta_y;
+      } else {
+        // If the block info doesn't exist, create a new one
+        const newBlockInfo: BlockInfo = {
+          id: id,
+          name: name,
+          classType: classType, 
+          x:delta_x,
+          y:e.delta_y,
+          tailwindClassName: tailwindClassName
+        };
+        updatedCanvasMap.set(id, newBlockInfo);
+      }
+  
+  
+      return updatedCanvasMap;
+    });
+  };
+
   return (
     
-    <div>
-      <Main />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Main canvasMap={canvasMap} getBlockInformation={fooGetBlockInformation}/>} />
+        <Route
+          path="/dataset-creator"
+          element={<DatasetCreator canvasMap={canvasMap} addDatasetToCanvasMap={updateCanvasMap} />}
+        />
+    
+      </Routes>
+    </Router>
     
   );
 }

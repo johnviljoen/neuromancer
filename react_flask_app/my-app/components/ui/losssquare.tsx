@@ -8,13 +8,13 @@ import { CSS } from "@dnd-kit/utilities";
 
 import DraggableSquare, { DraggableSquareProps } from './draggablesquare'; // Assuming DraggableSquare is exported as a named export
 
-interface IntegratorSquareProps extends DraggableSquareProps {
+interface LossSquareProps extends DraggableSquareProps {
   
 }
 
-const IntegratorSquare: React.FC<IntegratorSquareProps> = ({ name, xpos, ypos, classType, ...props }) => {
+const LossSquare: React.FC<LossSquareProps> = ({ name, xpos, ypos, classType, ...props }) => {
   const { attributes, listeners, setNodeRef } = useDroppable({
-    id: 'integrator-square', // Unique ID for the droppable
+    id: 'loss-square', // Unique ID for the droppable
     data: { props }, // Pass props as data
     onDrop: (event) => {
       const droppedId = event.active.id; // Get the ID of the dropped item
@@ -34,11 +34,11 @@ const IntegratorSquare: React.FC<IntegratorSquareProps> = ({ name, xpos, ypos, c
         xpos={xpos}
         ypos={ypos}
         classType={classType}
-        tailwindClassName="w-32 h-32 bg-orange-500 m-2 flex items-center justify-center rounded" // Apply a class to distinguish IntegratorSquare
+        tailwindClassName="w-32 h-32 bg-green-500 m-2 flex items-center justify-center rounded" // Apply a class to distinguish IntegratorSquare
         {...props}
       />
     </div>
   );
 };
 
-export default IntegratorSquare;
+export default LossSquare;

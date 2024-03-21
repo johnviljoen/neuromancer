@@ -13,14 +13,16 @@ export interface DraggableSquareProps {
   name: string;
   xpos: number; 
   ypos: number; 
+  classType: string;
   tailwindClassName: string; // Make otherstyles optional
+  id: string 
 };
 
-const DraggableSquare: React.FC<DraggableSquareProps> = ({ name, xpos, ypos, tailwindClassName }) => {
+const DraggableSquare: React.FC<DraggableSquareProps> = ({ name, xpos, ypos, classType, tailwindClassName }) => {
   const id = useId(); // Using a custom hook to generate unique IDs
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: id,
-    data: { name: name },
+    data: { id: id, name: name, classType: classType, tailwindClassName: tailwindClassName },
 
   });
 

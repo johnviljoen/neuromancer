@@ -3,15 +3,17 @@
 import React from 'react';
 import {FC} from "react";
 import {useDroppable} from "@dnd-kit/core"
+import ReactFlow, { addEdge } from 'react-flow-renderer';
 import {DndContext, DragEndEvent} from "@dnd-kit/core"
 import DraggableSquare from '@/components/ui/draggablesquare';
+
 
 interface CanvasProps {
   canvasMap: Map<string, BlockInfo>; 
 };
 
 const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
-  const blocksTailwindCSS = 
+
 
   const { setNodeRef, isOver } = useDroppable({
     id: "canvas-droppable"
@@ -25,7 +27,7 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
     
     console.log(elementsArray);
     return elementsArray.map(([id, blockInfo]) => (
-      <DraggableSquare name={blockInfo.name} xpos={blockInfo.delta_x} ypos={blockInfo.delta_y}/>
+      <DraggableSquare name={blockInfo.name} xpos={blockInfo.x} ypos={blockInfo.y} tailwindClassName={blockInfo.tailwindClassName}/>
     ));
   };
 

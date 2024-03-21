@@ -7,7 +7,8 @@ const IntegratorsContainer: React.FC = () => {
     <div className="flex items-center justify-center w-1/4 h-full bg-gray-200 dark:bg-gray-700 rounded-l-lg">
       <h2 className="text-lg font-semibold text-black">Integrators</h2>
       <div className="Neuromancer_Integrators_Container">
-        <IntegratorSquare name="Euler" xpos={0} ypos={0}/>
+        <IntegratorSquare name="diff_eq_integrator -- Euler" xpos={0} ypos={0} classType="neuromancer_integrator"/>
+        <IntegratorSquare name="diff_eq_integrator -- RK4" xpos={0} ypos={40} classType="neuromancer_integrator"/>
       </div>
     </div>
   );

@@ -22,7 +22,6 @@ import DebugWindow from "@/components/debugwindow";
 // import BlocksContainer from "@/components/blocks";
 import TrashCan from '@/components/ui/trashcan';
 import IntegratorsContainer from '@/components/integratorscontainer';
-import LossContainer from '@/components/losscontainer';
 import {DndContext, DragEndEvent} from "@dnd-kit/core"
 
 // Define BlockInfo type
@@ -31,20 +30,23 @@ type BlockInfo = {
   name: string;
   x: number;
   y: number;
-  classType: string;
-  tailwindClassName: string;
 };
 
-type MainProps = {
-  canvasMap: Map<string, BlockInfo>;
-  getBlockInformation: (e: any) => void;
-};
 
-export const Main: React.FC<MainProps> = ({ canvasMap, getBlockInformation }) => {
+
+
+const nodes = [
+    { id: '1', type: 'default', data: { label: 'Node 1' }, position: { x: 100, y: 100 } },
+    { id: '2', type: 'default', data: { label: 'Node 2' }, position: { x: 300, y: 100 } },
+  ];
+
+
+export function Main() {
   const [elements, setElements] = useState([]);
-  //const [canvasMap, setCanvasMap] = useState<Map<string, BlockInfo>>(new Map());
+  const [canvasMap, setCanvasMap] = useState<Map<string, BlockInfo>>(new Map());
   const [droppedItemId, setDroppedItemId] = useState<string | null>(null);
   
+
   function handleDragEnd(event: any) {
     if (event.over) {
       let newElements: any = [...elements, ...[event.active.data.current]];
@@ -53,11 +55,48 @@ export const Main: React.FC<MainProps> = ({ canvasMap, getBlockInformation }) =>
 
   }
 
+
+  const getBlockInformation = (e: DragEndEvent) => {
+    
+    const id = e.active.id;
+    setDroppedItemId(id);
+    console.log(e.active.id)
+    const name = e.active.data.current.name; 
+    const delta_x = e.delta.x ; 
+    const delta_y = e.delta.y; 
+    const tailwindClassName = e.active.data.current.tailwindClassName;
+
+    
+    setCanvasMap((prevCanvasMap) => {
+      const updatedCanvasMap = new Map(prevCanvasMap);
+      const existingBlockInfo = updatedCanvasMap.get(id);
   
+      if (existingBlockInfo) {
+        // If the block info exists, update its x and y
+        existingBlockInfo.x += delta_x;
+        existingBlockInfo.y += delta_y;
+      } else {
+        // If the block info doesn't exist, create a new one
+        const newBlockInfo: BlockInfo = {
+          id,
+          name,
+          x:delta_x,
+          y:e.delta_y,
+          tailwindClassName: tailwindClassName
+        };
+        updatedCanvasMap.set(id, newBlockInfo);
+      }
+
+
+      return updatedCanvasMap;
+    });
+  };
+
+
 
 
   return (  
-
+    
     <DndContext onDragEnd={getBlockInformation}>
       <div className="flex h-screen w-full flex-col">
         <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-900 px-6 dark:bg-gray-950" style={{ backgroundColor: "navy" }}>
@@ -87,24 +126,20 @@ export const Main: React.FC<MainProps> = ({ canvasMap, getBlockInformation }) =>
               <div className="flex items-center justify-center w-1/4 h-full bg-gray-200 dark:bg-gray-700 rounded-l-lg">
                 <h2 className="text-lg font-semibold text-black">BlocksContainer</h2>
                   <div className="Neuromancer_Components_Container">
-                      <DraggableSquare name="MLP" xpos={0} ypos={0} classType="neuromancer_block" tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
-                      <DraggableSquare name="resmlp" xpos={0} ypos={100} classType="neuromancer_block" tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
-                      <DraggableSquare name="Linear" xpos={0} ypos={200}  classType="neuromancer_block" tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
+                      <DraggableSquare name="MLP" xpos={0} ypos={0} tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
+                      <DraggableSquare name="ResNet" xpos={0} ypos={100}  tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
+                      <DraggableSquare name="Linear" xpos={0} ypos={200}  tailwindClassName="w-12 h-12 bg-blue-500 m-2 flex items-center justify-center rounded"/>
                     </div>
                   </div>
                   <div style={{ margin: '10px 10px' }} /> {/* Spacer with 10px margin */}
-                  <IntegratorsContainer /> {/* Add IntegratorsContainer here */}
-                  <div style={{ margin: '10px 10px' }} /> {/* Spacer with 10px margin */}
-                  <LossContainer /> {/* Add IntegratorsContainer here */}
-                <Canvas canvasMap={canvasMap}/>
+                  
+                <Canvas/>
               </div>
             </div>
           </div>
         </main>
         <Link to="/dataset-creator">Go to Dataset Creator</Link>
       </div>
-      
-    
     </DndContext>
 
  
