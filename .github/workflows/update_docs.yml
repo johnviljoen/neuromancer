@@ -18,7 +18,9 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         with:
           fetch-depth: 0
       # step 2: #syntax for telling GHA to set-up Python on this runner associated for this whole job
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10.13' 
 
       # Step 3: define a step that install dependencies (Sphinx etc) for this runner
       - name: Install dependencies #name of this step
