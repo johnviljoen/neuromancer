@@ -32,6 +32,7 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         run: |
           cd docs 
           ls
+          sphinx-apidoc --no-toc --module-first -o docs/autodoc src/stenotype
           sphinx-build source public -b dirhtml
         
 
