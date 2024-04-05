@@ -449,7 +449,7 @@ def train_neuromancer_problem():
         optimizer,
         patience=50,
         warmup=100,
-        epochs=500,
+        epochs=10,
         eval_metric="dev_loss",
         train_metric="train_loss",
         dev_metric="dev_loss",
@@ -458,6 +458,8 @@ def train_neuromancer_problem():
     )
 
     trainer.train()
+
+    return jsonify({'message': 'Trained successfully =' + problem_id})
 
 
 

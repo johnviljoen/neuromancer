@@ -19,12 +19,13 @@ export interface DraggableSquareProps {
 };
 
 const DraggableSquare: React.FC<DraggableSquareProps> = ({ name, xpos, ypos, classType, tailwindClassName }) => {
-  const id = useId(); // Using a custom hook to generate unique IDs
+  const id = useId(); 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: id,
     data: { id: id, name: name, classType: classType, tailwindClassName: tailwindClassName },
 
   });
+
 
  
 
@@ -42,7 +43,7 @@ const DraggableSquare: React.FC<DraggableSquareProps> = ({ name, xpos, ypos, cla
         top: `${ypos}px`,
 
       };
-
+  
   const mystyle = 
   {
     position: "relative",
@@ -54,6 +55,7 @@ const DraggableSquare: React.FC<DraggableSquareProps> = ({ name, xpos, ypos, cla
   return (
     <>
       <div
+        id={id}
         ref={setNodeRef}
         {...attributes}
         {...listeners}

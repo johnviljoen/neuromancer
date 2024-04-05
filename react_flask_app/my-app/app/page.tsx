@@ -14,7 +14,13 @@ import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, Dropdown
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Main } from "@/components/main";
 import { DatasetCreator } from "@/components/datasetcreator"
- import {DndContext, DragEndEvent} from "@dnd-kit/core"
+import {DndContext, DragEndEvent} from "@dnd-kit/core"
+import ReactFlow, {
+  addEdge,
+  useNodesState,
+  useEdgesState,
+  Controls,
+} from 'reactflow';
 
  type BlockInfo = {
   id: string;
@@ -30,59 +36,59 @@ import { DatasetCreator } from "@/components/datasetcreator"
 export default function App() {
   const [datasets, setDatasets] = useState([]);
   const [canvasMap, setCanvasMap] = useState<Map<string, BlockInfo>>(new Map());
+  const [draggedItem, setDraggedItem] = useState<BlockInfo | null>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+
 
   const updateCanvasMap = (newCanvasMap: Map<string, BlockInfo>) => {
     setCanvasMap(newCanvasMap);
   };
 
-  console.log("CANVS MAP ROOT");
-  console.log(canvasMap);
 
   const fooGetBlockInformation = (e: DragEndEvent) => {
-    
     const id = e.active.id;
-
-    const name = e.active.data.current.name.toLowerCase(); 
     const classType = e.active.data.current.classType.toLowerCase();
-    const delta_x = e.delta.x ; 
-    const delta_y = e.delta.y; 
     const tailwindClassName = e.active.data.current.tailwindClassName;
-
     
+    const delta_x = e.delta.x;
+    const delta_y = e.delta.y;
     
+  
+    // Update the canvas map
     setCanvasMap((prevCanvasMap) => {
       const updatedCanvasMap = new Map(prevCanvasMap);
       const existingBlockInfo = updatedCanvasMap.get(id);
-
-
   
       if (existingBlockInfo) {
         // If the block info exists, update its x and y
         existingBlockInfo.x += delta_x;
         existingBlockInfo.y += delta_y;
+        setDraggedItem(existingBlockInfo);
       } else {
         // If the block info doesn't exist, create a new one
+        const name = e.active.data.current.name.toLowerCase();
         const newBlockInfo: BlockInfo = {
-          id: id,
-          name: name,
-          classType: classType, 
-          x:delta_x,
-          y:e.delta_y,
+          id,
+          name,
+          classType,
+          delta_x,
+          delta_y,
           tailwindClassName: tailwindClassName
         };
         updatedCanvasMap.set(id, newBlockInfo);
+        setDraggedItem(newBlockInfo);
       }
-  
-  
       return updatedCanvasMap;
     });
   };
+  
 
   return (
     
     <Router>
       <Routes>
-        <Route path="/" element={<Main canvasMap={canvasMap} getBlockInformation={fooGetBlockInformation}/>} />
+        <Route path="/" element={<Main canvasMap={canvasMap} getBlockInformation={fooGetBlockInformation} draggedItem={draggedItem}/>} />
         <Route
           path="/dataset-creator"
           element={<DatasetCreator canvasMap={canvasMap} addDatasetToCanvasMap={updateCanvasMap} />}

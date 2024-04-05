@@ -25,15 +25,15 @@ const generateUniqueId = () => {
   return `dataset_${Math.random().toString(36).substr(2, 9)}`;
 };
 
-
+e
 const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [reactFlowInstance, setReactFlowInstance] = useState(null);
     const [showData, setShowData] = React.useState(false);
     const [sendingCanvasMapData, setSendingCanvasMapData] = useState(false);
     const [problemConstructed, setProblemConstructed] = useState(false); 
     const [draggedItem, setDraggedItem] = useState(null);
-    const [reactFlowInstance, setReactFlowInstance] = useState(null);
 
     const sendDataToBackend = async (data) => {
       try {
@@ -126,58 +126,42 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
       (params) => setEdges((eds) => addEdge(params, eds)),
       [setEdges],
     );
-  
-
-   
-    const { setNodeRef, isOver, over, node } = useDroppable({
-      id: "canvas-droppable"
-      
-    }); 
-
+    const onDragOver = useCallback((event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+      }, []);
     
+    const onDrop = useCallback(
+    (event) => {
+        event.preventDefault();
+
+        const id = event.dataTransfer.getData('application/reactflow');
+
+        // check if the dropped element is valid
+        if (typeof type === 'undefined' || !type) {
+        return;
+        }
+
+        // reactFlowInstance.project was renamed to reactFlowInstance.screenToFlowPosition
+        // and you don't need to subtract the reactFlowBounds.left/top anymore
+        // details: https://reactflow.dev/whats-new/2023-11-10
+        const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+        });
+        const newNode = {
+        id: getId(),
+        type,
+        position,
+        data: { label: `${type} node` },
+        };
+
+        setNodes((nds) => nds.concat(newNode));
+    },
+    [reactFlowInstance],
+    );
 
   
-    const mappedNodes = useMemo(() => {
-      return Array.from(canvasMap.entries()).map(([id, blockInfo], index) => {
-        let style = {};
-        if (blockInfo.type === 'default') {
-          style = { background: '#FFF' };
-        } else if (blockInfo.type === 'custom') {
-          style = { background: '#FF0000' }; // Example color for custom type
-        }
-        console.log("BLOCK INFO NEW CANVAS ");
-        console.log(blockInfo);
-      
-        return {
-          id,
-          type: 'default',
-          style,
-          data: { label: blockInfo.name, classType: blockInfo.classType, },
-          position: { x: blockInfo.x, y: index * 100 }, // Adjust y position based on index
-        };
-      });
-    }, [canvasMap]);
-  
-    useEffect(() => {
-      // Update the nodes state when mappedNodes changes
-      setNodes(mappedNodes);
-    }, [mappedNodes, setNodes]);
-  
-    const nodeTypes = useMemo(() => ({
-      default: DraggableSquare,
-    }), []);
-  
-    const handleShowData = () => {
-        setShowData(true);
-        console.log("Nodes:");
-        nodes.forEach(node => {
-          const blockInfo = canvasMap.get(node.id);
-          if (blockInfo) {
-            console.log(`Node ID: ${node.id}, Name: ${blockInfo.name}, X: ${blockInfo.x}, Y: ${blockInfo.y}`);
-          }
-        });
-        console.log("Edges:", edges);
-      };
   
       return (
         <div

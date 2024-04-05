@@ -38,22 +38,26 @@ type BlockInfo = {
 type MainProps = {
   canvasMap: Map<string, BlockInfo>;
   getBlockInformation: (e: any) => void;
+  draggedItem: BlockInfo | null; // Add draggedItem prop
+
 };
 
-export const Main: React.FC<MainProps> = ({ canvasMap, getBlockInformation }) => {
+export const Main: React.FC<MainProps> = ({ canvasMap, getBlockInformation, draggedItem }) => {
   const [elements, setElements] = useState([]);
   //const [canvasMap, setCanvasMap] = useState<Map<string, BlockInfo>>(new Map());
   const [droppedItemId, setDroppedItemId] = useState<string | null>(null);
   
   function handleDragEnd(event: any) {
+    
     if (event.over) {
+      const draggedBlockId = event.active; // Access the ID of the dragged block
+      console.log("Dragged block ID:", draggedBlockId);
       let newElements: any = [...elements, ...[event.active.data.current]];
       setElements(newElements);
     }
 
   }
 
-  
 
 
   return (  

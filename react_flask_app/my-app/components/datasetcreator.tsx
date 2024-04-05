@@ -121,7 +121,7 @@ export const DatasetCreator: React.FC<DatasetCreatorProps> = ({ canvasMap, addDa
 
 
     return (
-      <XYPlot width={800} height={800}>
+      <XYPlot width={400} height={400}>
         <HorizontalGridLines />
         <VerticalGridLines />
         <XAxis title="X Axis" />
