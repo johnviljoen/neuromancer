@@ -143,11 +143,8 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
         if (blockInfo.type === 'default') {
           style = { background: '#FFF' };
         } else if (blockInfo.type === 'custom') {
-          style = { background: '#FF0000' }; // Example color for custom type
-        }
-        console.log("BLOCK INFO NEW CANVAS ");
-        console.log(blockInfo);
-      
+          style = { background: '#FF0000' }; 
+        }      
         return {
           id,
           type: 'default',

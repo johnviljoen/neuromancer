@@ -46,7 +46,7 @@ export default function App() {
   };
 
 
-  const fooGetBlockInformation = (e: DragEndEvent) => {
+  const getBlockInformation = (e: DragEndEvent) => {
     const id = e.active.id;
     const classType = e.active.data.current.classType.toLowerCase();
     const tailwindClassName = e.active.data.current.tailwindClassName;
