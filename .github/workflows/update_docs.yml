@@ -18,7 +18,9 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         with:
           fetch-depth: 0
       # step 2: #syntax for telling GHA to set-up Python on this runner associated for this whole job
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10.13' 
 
       # Step 3: define a step that install dependencies (Sphinx etc) for this runner
       - name: Install dependencies #name of this step
@@ -30,7 +32,8 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         run: |
           cd docs 
           ls
-          sphinx-build -M html source build
+          sphinx-apidoc --no-toc --module-first -o docs/autodoc
+          sphinx-build source public -b dirhtml
         
 
 
@@ -45,7 +48,7 @@ jobs: #define set of jobs. Here there is only one job, each job is instantiated 
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
-          keep_files: true 
+          publish_dir: public
+     
 
 
