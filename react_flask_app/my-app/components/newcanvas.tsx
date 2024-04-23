@@ -1,8 +1,9 @@
 // Canvas.tsx
 "use client"; // top to the file
-import React,  { useMemo, useCallback, useEffect, useState, useId } from 'react';
+import React,  { useMemo, useCallback, useEffect, useState, useId, useRef } from 'react';
 import {FC} from "react";
 import {useDroppable} from "@dnd-kit/core"
+import ContextMenu from '@/components/contextmenu'; // Import the ContextMenu component
 
 import ReactFlow, { Controls, Background ,useNodesState, useEdgesState, addEdge } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -34,6 +35,12 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
     const [problemConstructed, setProblemConstructed] = useState(false); 
     const [draggedItem, setDraggedItem] = useState(null);
     const [reactFlowInstance, setReactFlowInstance] = useState(null);
+    const canvasRef = useRef(null);
+    const [contextMenuOpen, setContextMenuOpen] = useState(false);
+    const [selectedNodeId, setSelectedNodeId] = useState(null);
+    const [hyperparameters, setHyperparameters] = useState({ nodeId: null, hiddenSize: '' }); // Track hyperparameters and the corresponding node ID
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 }); // Initialize context menu position state
+
 
     const sendDataToBackend = async (data) => {
       try {
@@ -134,6 +141,16 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
       
     }); 
 
+    const calculateNodePosition = (index: number) => {
+      const canvasWidth = canvasRef.current.offsetWidth;
+      const canvasHeight = canvasRef.current.offsetHeight;
+      const numNodes = canvasMap.size;
+      const spacing = 140;
+      const centerX = canvasWidth / 2;
+      const centerY = canvasHeight / 2;
+      const offsetX = (numNodes % 2 === 0 ? (index - numNodes / 2 + 0.5) : (index - (numNodes - 1) / 2)) * spacing;
+      return { x: centerX + offsetX, y: centerY };
+    };
     
 
   
@@ -150,7 +167,8 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
           type: 'default',
           style,
           data: { label: blockInfo.name, classType: blockInfo.classType, },
-          position: { x: blockInfo.x, y: index * 100 }, // Adjust y position based on index
+          //position: { x: blockInfo.x, y: index * 100 }, // Adjust y position based on index
+          position: calculateNodePosition(index)
         };
       });
     }, [canvasMap]);
@@ -175,11 +193,47 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
         });
         console.log("Edges:", edges);
       };
+
+    // Add a function to handle opening context menu
+    const handleOpenContextMenu = (event, nodeId) => {
+      event.preventDefault(); // Prevent default right-click behavior
+      setSelectedNodeId(nodeId);
+      setContextMenuOpen(true);
+
+      // Calculate position relative to the node
+      const { clientX, clientY } = event;
+      const { top, left } = event.currentTarget.getBoundingClientRect();
+      const posX = clientX - left;
+      const posY = clientY - top;
+
+      // Calculate absolute coordinates on the page
+      const absoluteX = posX + window.pageXOffset; // Add horizontal scroll offset
+      const absoluteY = posY + window.pageYOffset; // Add vertical scroll offset
+
+      console.log("MENU POSITION");
+      console.log({ x: absoluteX, y: absoluteY });
+      // Update context menu position
+      setContextMenuPosition({ x: absoluteX, y: absoluteY });
+    };
+
+    // Add a function to handle closing context menu
+    const handleCloseContextMenu = () => {
+      setContextMenuOpen(false);
+      setSelectedNodeId(null);
+    };
+
+    // Add a function to handle submitting hyperparameters
+    const handleSubmitHyperparameters = (hiddenSize, nodeId) => {
+      // Here you can handle the submission of hyperparameters for the selected node
+      console.log('Node ID:', nodeId);
+      console.log('Hidden Size:', hiddenSize);
+      setHyperparameters({ nodeId, hiddenSize }); // Update hyperparameters state with node ID and hidden size
+    };
   
       return (
         <div
           className="flex items-center justify-center w-3/4 h-full bg-gray-50 dark:bg-gray-800 rounded-r-lg"
-          ref={setNodeRef}
+          ref={canvasRef}
         >
           <div style={{ width: '100vw', height: '80vh' }}>
             <ReactFlow
@@ -188,7 +242,11 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onNodeContextMenu={(event, node) => handleOpenContextMenu(event, node.id)}
+              snapToGrid={true}
+              snapGrid={[15, 15]}
             />
+            <ContextMenu isOpen={contextMenuOpen} onClose={handleCloseContextMenu} onSubmit={handleSubmitHyperparameters} nodeId={selectedNodeId} position={contextMenuPosition}/>
             <Button className="h-9" onClick={handleConstructProblem} disabled={sendingCanvasMapData}>
               Create Neuromancer Problem
             </Button>
