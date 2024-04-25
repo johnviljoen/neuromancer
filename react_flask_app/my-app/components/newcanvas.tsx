@@ -157,11 +157,13 @@ const Canvas: React.FC<CanvasProps> = ({ canvasMap }) => {
     const mappedNodes = useMemo(() => {
       return Array.from(canvasMap.entries()).map(([id, blockInfo], index) => {
         let style = {};
-        if (blockInfo.type === 'default') {
-          style = { background: '#FFF' };
-        } else if (blockInfo.type === 'custom') {
-          style = { background: '#FF0000' }; 
-        }      
+        if (blockInfo.classType === 'neuromancer_block') {
+          style = { background: '#3b82f6' };
+        } else if (blockInfo.classType === 'neuromancer_integrator') { 
+          style = { background: '#f97316'};
+        } else if (blockInfo.classType === 'neuromancer_loss') { 
+          style = { background: '#34d399'};
+        } 
         return {
           id,
           type: 'default',
