@@ -24,6 +24,7 @@ import TrashCan from '@/components/ui/trashcan';
 import IntegratorsContainer from '@/components/integratorscontainer';
 import LossContainer from '@/components/losscontainer';
 import {DndContext, DragEndEvent} from "@dnd-kit/core"
+import logo from '@/assets/neuromancer_logo.png'; // Import your logo image
 
 // Define BlockInfo type
 type BlockInfo = {

@@ -22,6 +22,9 @@ import ReactFlow, {
   Controls,
 } from 'reactflow';
 
+
+
+
  type BlockInfo = {
   id: string;
   name: string;
@@ -87,14 +90,14 @@ export default function App() {
   return (
     
     <Router>
-      <Routes>
-        <Route path="/" element={<Main canvasMap={canvasMap} getBlockInformation={fooGetBlockInformation} draggedItem={draggedItem}/>} />
-        <Route
-          path="/dataset-creator"
-          element={<DatasetCreator canvasMap={canvasMap} addDatasetToCanvasMap={updateCanvasMap} />}
-        />
-    
-      </Routes>
+          <Routes>
+            <Route path="/" element={<Main canvasMap={canvasMap} getBlockInformation={fooGetBlockInformation} draggedItem={draggedItem}/>} />
+            <Route
+              path="/dataset-creator"
+              element={<DatasetCreator canvasMap={canvasMap} addDatasetToCanvasMap={updateCanvasMap} />}
+            />
+        
+          </Routes>
     </Router>
     
   );
